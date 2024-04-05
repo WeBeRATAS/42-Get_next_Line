@@ -6,7 +6,7 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 13:13:00 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/05 13:49:43 by rbuitrag         ###   ########.fr       */
+/*   Updated: 2024/04/05 14:42:40 by fcarranz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	i = 0;
 	j = 0;
 	if (new == NULL)
-		return (NULL);
+		return (free(s1), NULL);
 	while (i < len_s1)
 	{
 		new[i] = s1[i];

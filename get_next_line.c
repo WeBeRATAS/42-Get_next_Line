@@ -6,7 +6,7 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 13:12:32 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/05 13:49:06 by rbuitrag         ###   ########.fr       */
+/*   Updated: 2024/04/05 14:42:38 by fcarranz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,9 @@ static char	*ft_line(char *buffer)
 		return (NULL);
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
-	line = ft_calloc(i + 2, sizeof(char));
+	if (buffer[i] == '\n')
+		i++;
+	line = ft_calloc(i + 1, sizeof(char));
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 	{
@@ -64,6 +66,8 @@ static char	*ft_read_line(int fd, char *buffer)
 	ssize_t	read_bytes;
 
 	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!tmp)
+		return (free(buffer), NULL);
 	read_bytes = 1;
 	while (read_bytes != 0 && !ft_strchr(buffer, '\n'))
 	{
