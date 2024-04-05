@@ -6,7 +6,7 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 11:54:35 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/03 18:33:26 by rbuitrag         ###   ########.fr       */
+/*   Updated: 2024/04/05 08:35:16 by rbuitrag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,15 @@ size_t	ft_strlen(const char *s)
  *  new buffer, considering both sets of data,  takes the old Basic_buffer
  *   and the read_buffer as arguments and concatenates
  *   them into a new buffer */
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(const char *s1, const char *s2)
 {
 	char	*res;
-	int		i;
-	int		j;
+	size_t	i;
+	size_t	j;
 
 	i = 0;
-	res = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (!res || !s1 || !s2)
+	res = ft_calloc(sizeof(char), ((ft_strlen(s1) + ft_strlen(s2)) + 1));
+	if (!res)
 	{
 		free(res);
 		return (NULL);
@@ -54,12 +54,12 @@ char	*ft_strjoin(char const *s1, char const *s2)
 		i++;
 		j++;
 	}
-	res[i] = '\0';
+	res[i] = 0;
 	return (res);
 }
 
 /* Function I use to find the line breaks and validate str(*s) or find the
- * end with '\0' */
+ * end with '\0'*/
 char	*ft_strchr(const char *string, int searChar)
 {
 	char	*str;
@@ -73,7 +73,8 @@ char	*ft_strchr(const char *string, int searChar)
 		return (NULL);
 }
 
-void	ft_bzero(void *s, size_t n)
+/*
+void	ft_bzero(char *s, size_t n)
 {
 	char	*str;
 	size_t	i;
@@ -85,17 +86,22 @@ void	ft_bzero(void *s, size_t n)
 		str[i] = '\0';
 		i++;
 	}
-}
+}*/
 
 void	*ft_calloc(size_t count, size_t size)
 {
 	char	*result;
+	size_t	i;
 
+	i = 0;
 	result = malloc(count * size);
 	if (!result)
+			return (0);
+	while (i < count * size)
 	{
-		return (NULL);
+		result[i] = 0;
+		i++;
 	}
-	ft_bzero(result, count * size);
+	//ft_bzero(result, (count * size)); # Prueba mas simple PACO igual
 	return (result);
 }

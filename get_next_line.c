@@ -6,14 +6,14 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 11:54:07 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/04 12:16:19 by rbuitrag         ###   ########.fr       */
+/*   Updated: 2024/04/05 12:11:40 by rbuitrag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
 /* join and free */
-char	*ft_free(char *buffer, char *buf)
+static char	*ft_free(char *buffer, char *buf)
 {
 	char	*temp;
 
@@ -25,7 +25,7 @@ char	*ft_free(char *buffer, char *buf)
 /* delete line find */
 /* find len of first line */
 /* if eol == \0 return NULL */
-char	*ft_next(char *buffer)
+static char	*ft_next_line(char *buffer)
 {
 	int		i;
 	int		j;
@@ -40,15 +40,16 @@ char	*ft_next(char *buffer)
 		return (NULL);
 	}
 	line = ft_calloc((ft_strlen(buffer) - i + 1), sizeof(char));
-	if (!line)
+	/*if (!line)
 	{
 		free(line);
 		return (NULL);
-	}
+	} Si comento esto no cambia nada del paco, asi que sobrara */
 	i++;
 	j = 0;
 	while (buffer[i])
 		line[j++] = buffer[i++];
+	line[j] = '\0';
 	free(buffer);
 	return (line);
 }
@@ -56,7 +57,7 @@ char	*ft_next(char *buffer)
 /* take line for return */
 /* if no line return NULL */
 /* go to the eol */
-char	*ft_line(char *buffer)
+static char	*ft_line(char *buffer)
 {
 	char	*line;
 	int		i;
@@ -67,51 +68,50 @@ char	*ft_line(char *buffer)
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
 	line = ft_calloc(i + 2, sizeof(char));
-	if (!line)
+	/*if (!line)
 	{
 		free(line);
 		return (NULL);
-	}
+	}No cambia nada si quito esta proteccion en paco*/
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 	{
 		line[i] = buffer[i];
 		i++;
 	}
-	if (buffer[i] && buffer[i] == '\n')
-		line[i++] = '\n';
+	if (buffer[i] == '\n')
+		line[i] = '\n';
 	return (line);
 }
 
-char	*ft_read_file(int fd, char *res)
+static char	*ft_read_line(int fd, char *buffer)
 {
-	char	*buffer;
+	char	*tmp;
 	int		byte_read;
 
-	if (!res)
-		res = ft_calloc(1, 1);
-	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!buffer)
+		buffer = ft_calloc(1, 1);
+	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!tmp)
 	{
-		free(buffer);
+		free(tmp);
 		return (NULL);
 	}
 	byte_read = 1;
-	while (byte_read > 0)
+	while (byte_read > 0 && (!ft_strchr(tmp, '\n')))
 	{
-		byte_read = read(fd, buffer, BUFFER_SIZE);
-		if (byte_read == -1)
+		byte_read = read(fd, tmp, BUFFER_SIZE);
+		if (byte_read == -1 || byte_read > BUFFER_SIZE)
 		{
 			free(buffer);
+			free(tmp);
 			return (NULL);
 		}
-		buffer[byte_read] = 0;
-		res = ft_free(res, buffer);
-		if (ft_strchr(buffer, '\n'))
-			break ;
+		tmp[byte_read] = '\0';
+		buffer = ft_free(buffer, tmp);
 	}
-	free(buffer);
-	return (res);
+	free(tmp);
+	return (buffer);
 }
 
 char	*get_next_line(int fd)
@@ -119,16 +119,17 @@ char	*get_next_line(int fd)
 	static char	*buffer;
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0 \
+			|| BUFFER_SIZE == 'NULL')
 		return (NULL);
-	buffer = ft_read_file(fd, buffer);
+	buffer = ft_read_line(fd, buffer);
 	if (!buffer)
 	{
-		free(buffer);
+		//free(buffer); ### No cambia nada en PACO si lo comento
 		return (NULL);
 	}
 	line = ft_line(buffer);
-	buffer = ft_next(buffer);
+	buffer = ft_next_line(buffer);
 	return (line);
 }
 /*
@@ -139,7 +140,7 @@ int	main(void)
 	int		count;
 
 	count = 0;
-	fd = open("example02.txt", O_RDONLY);
+	fd = open("read_error.txt", O_RDONLY);
 	if (fd == -1)
 	{
 		printf("Error opening file");
