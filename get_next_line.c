@@ -6,13 +6,13 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 13:12:32 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/05 14:42:38 by fcarranz         ###   ########.fr       */
+/*   Updated: 2024/04/08 17:06:38 by rbuitrag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static char	*ft_next_line(char *buffer)
+char	*ft_next_line(char *buffer)
 {
 	int		i;
 	int		j;
@@ -22,10 +22,7 @@ static char	*ft_next_line(char *buffer)
 	while (buffer[i] && buffer[i] != '\n')
 		i++;
 	if (!buffer[i])
-	{
-		free(buffer);
-		return (NULL);
-	}
+		return (free(buffer), NULL);
 	leftover = ft_calloc(ft_strlen(buffer) - i + 1, sizeof(char));
 	i++;
 	j = 0;
@@ -36,7 +33,7 @@ static char	*ft_next_line(char *buffer)
 	return (leftover);
 }
 
-static char	*ft_line(char *buffer)
+char	*ft_line(char *buffer)
 {
 	int		i;
 	char	*line;
@@ -49,6 +46,8 @@ static char	*ft_line(char *buffer)
 	if (buffer[i] == '\n')
 		i++;
 	line = ft_calloc(i + 1, sizeof(char));
+	if (!line)
+		return (free(line), NULL);
 	i = 0;
 	while (buffer[i] && buffer[i] != '\n')
 	{
@@ -60,26 +59,26 @@ static char	*ft_line(char *buffer)
 	return (line);
 }
 
-static char	*ft_read_line(int fd, char *buffer)
+char	*ft_read_line(int fd, char *buffer)
 {
 	char	*tmp;
 	ssize_t	read_bytes;
 
+	if (!buffer)
+		buffer = ft_calloc(1, 1);
 	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!tmp)
 		return (free(buffer), NULL);
 	read_bytes = 1;
-	while (read_bytes != 0 && !ft_strchr(buffer, '\n'))
+	while (read_bytes > 0)
 	{
 		read_bytes = read(fd, tmp, BUFFER_SIZE);
 		if (read_bytes == -1)
-		{
-			free(buffer);
-			free(tmp);
-			return (NULL);
-		}
+			return (free(buffer), free(tmp), NULL);
 		tmp[read_bytes] = '\0';
 		buffer = ft_strjoin(buffer, tmp);
+		if (ft_strchr(buffer, '\n'))
+			break ;
 	}
 	free(tmp);
 	return (buffer);
@@ -92,11 +91,15 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	buffer = ft_read_line(fd, buffer);
-	if (!buffer)
-		return (NULL);
-	line = ft_line(buffer);
-	buffer = ft_next_line(buffer);
+	else
+		buffer = ft_read_line(fd, buffer);
+	if (buffer == NULL)
+		return (free(buffer), NULL);
+	else
+	{
+		line = ft_line(buffer);
+		buffer = ft_next_line(buffer);
+	}
 	return (line);
 }
 /*

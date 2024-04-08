@@ -6,13 +6,13 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 13:13:00 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/05 14:42:40 by fcarranz         ###   ########.fr       */
+/*   Updated: 2024/04/08 16:48:31 by rbuitrag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_strlen(char *s)
+size_t	ft_strlen(char *s)
 {
 	size_t	i;
 
@@ -26,17 +26,13 @@ int	ft_strlen(char *s)
 
 char	*ft_strchr(char *s, int c)
 {
-	unsigned int	i;
+	unsigned long int	i;
 
 	i = 0;
 	if (!s)
-		return (0);
-	while (s[i] != '\0')
-	{
-		if (s[i] == (char)c)
-			return ((char *)&s[i]);
+		return (free(s), NULL);
+	while (s[i] != '\0' && s[i] != c)
 		i++;
-	}
 	if ((char)c == s[i])
 		return ((char *)&s[i]);
 	return (NULL);
@@ -48,9 +44,12 @@ void	*ft_calloc(size_t count, size_t size)
 	size_t	i;
 
 	i = 0;
-	mem = malloc(count * size);
-	if (!mem)
+	if (!count || !size)
 		return (0);
+	else
+		mem = malloc(count * size);
+	if (!mem)
+		return (free(mem), NULL);
 	while (i < size * count)
 	{
 		mem[i] = 0;
