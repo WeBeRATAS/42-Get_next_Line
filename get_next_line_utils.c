@@ -6,7 +6,7 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 13:13:00 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/08 16:48:31 by rbuitrag         ###   ########.fr       */
+/*   Updated: 2024/04/09 17:12:41 by rbuitrag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ char	*ft_strchr(char *s, int c)
 
 	i = 0;
 	if (!s)
-		return (free(s), NULL);
+		return (NULL);
 	while (s[i] != '\0' && s[i] != c)
 		i++;
 	if ((char)c == s[i])
@@ -68,21 +68,17 @@ char	*ft_strjoin(char *s1, char *s2)
 
 	len_s1 = ft_strlen(s1);
 	len_s2 = ft_strlen(s2);
-	new = ft_calloc((len_s1 + len_s2 + 1), sizeof(char));
 	i = 0;
 	j = 0;
+	new = ft_calloc((len_s1 + len_s2 + 1), sizeof(char));
 	if (new == NULL)
 		return (free(s1), NULL);
-	while (i < len_s1)
-	{
-		new[i] = s1[i];
-		i++;
-	}
-	while (j < len_s2)
-	{
-		new[i + j] = s2[j];
-		j++;
-	}
+	while (s1[i] != '\0')
+		new[j++] = s1[i++];
+	j = 0;
+	while (s2[j] != '\0')
+		new[i++] = s2[j++];
+	new[i] = '\0';
 	free(s1);
 	return (new);
 }

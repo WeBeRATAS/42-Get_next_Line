@@ -6,7 +6,7 @@
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 13:12:32 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/08 17:06:38 by rbuitrag         ###   ########.fr       */
+/*   Updated: 2024/04/09 16:54:47 by rbuitrag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@ char	*ft_next_line(char *buffer)
 	if (!buffer[i])
 		return (free(buffer), NULL);
 	leftover = ft_calloc(ft_strlen(buffer) - i + 1, sizeof(char));
+	if (!leftover)
+		return (free(buffer), NULL);
 	i++;
 	j = 0;
 	while (buffer[i])
@@ -65,23 +67,26 @@ char	*ft_read_line(int fd, char *buffer)
 	ssize_t	read_bytes;
 
 	if (!buffer)
-		buffer = ft_calloc(1, 1);
+	{
+		buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+		if (buffer == NULL)
+			return (NULL);
+	}
 	tmp = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	if (!tmp)
-		return (free(buffer), NULL);
+		return (free(buffer), buffer = NULL, NULL);
 	read_bytes = 1;
-	while (read_bytes > 0)
+	while (read_bytes > 0 && !ft_strchr(buffer, '\n'))
 	{
 		read_bytes = read(fd, tmp, BUFFER_SIZE);
 		if (read_bytes == -1)
 			return (free(buffer), free(tmp), NULL);
 		tmp[read_bytes] = '\0';
 		buffer = ft_strjoin(buffer, tmp);
-		if (ft_strchr(buffer, '\n'))
-			break ;
+		if (!buffer)
+			return (free(tmp), NULL);
 	}
-	free(tmp);
-	return (buffer);
+	return (free(tmp), buffer);
 }
 
 char	*get_next_line(int fd)
@@ -91,15 +96,13 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	else
-		buffer = ft_read_line(fd, buffer);
+	buffer = ft_read_line(fd, buffer);
 	if (buffer == NULL)
-		return (free(buffer), NULL);
-	else
-	{
-		line = ft_line(buffer);
-		buffer = ft_next_line(buffer);
-	}
+		return (NULL);
+	line = ft_line(buffer);
+	if (!line)
+		return (free(buffer), buffer = NULL, NULL);
+	buffer = ft_next_line(buffer);
 	return (line);
 }
 /*
