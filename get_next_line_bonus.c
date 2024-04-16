@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rbuitrag <rbuitrag@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/29 13:12:32 by rbuitrag          #+#    #+#             */
-/*   Updated: 2024/04/16 13:32:00 by rbuitrag         ###   ########.fr       */
+/*   Updated: 2024/04/16 13:34:07 by rbuitrag         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*ft_next_line(char *buffer)
 {
@@ -91,57 +91,40 @@ char	*ft_read_line(int fd, char *buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[OPEN_MAX];
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= OPEN_MAX)
 		return (NULL);
-	buffer = ft_read_line(fd, buffer);
-	if (buffer == NULL)
+	buffer[fd] = ft_read_line(fd, buffer[fd]);
+	if (buffer[fd] == NULL)
 		return (NULL);
-	line = ft_line(buffer);
+	line = ft_line(buffer[fd]);
 	if (!line)
-		return (free(buffer), buffer = NULL, NULL);
-	buffer = ft_next_line(buffer);
+		return (free(buffer[fd]), buffer[fd] = NULL, NULL);
+	buffer[fd] = ft_next_line(buffer[fd]);
 	return (line);
 }
 /*
 int	main(void)
 {
-	int	fd;
-
-	fd = open("prueba.txt", O_RDONLY);
-	if (fd == -1)
-	{
-		perror ("open");
-		exit(EXIT_FAILURE);
-	}
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	printf("%s", get_next_line(fd));
-	close(fd);
-	return (0);
 	int		fd;
 	char	*line;
-	int		count;
+	int	i;
 
-	count = 0;
-	fd = open("prueba.txt", O_RDONLY);
+	i = 1;
+	fd = open("example01.txt", O_RDONLY);
 	if (fd == -1)
+		exit (1);
+	line = get_next_line(fd);
+	while (line != NULL)
 	{
-		printf("Error opening file");
-		return (1);
-	}
-	while (1)
-	{
-		line = get_next_line(fd);
-		if (line == NULL)
-			break ;
-		count++;
-		printf("[%d]:%s\n", count, line);
+		printf("line %d: %s",i, line);
 		free(line);
-		line = NULL;
+		i++;
+		line = get_next_line(fd);
 	}
-	close(fd);
-		return (0);
+	if (line == NULL)
+		printf("line %d: %s", i, line);
+	return (0);
 }*/
